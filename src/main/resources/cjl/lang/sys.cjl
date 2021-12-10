@@ -1,0 +1,10 @@
+设 函数 输出 （ 任意 obj ， 字符串 end ） {
+    设 java类 sys 为 java.lang.System
+    设 静态 java字段 o 为 sys 中的 out
+    调用 java函数 print （ obj ）
+    调用 java函数 print （ end ）
+}
+
+set function print ( any obj , string end ) {
+    call 输出 ( obj , end )
+}

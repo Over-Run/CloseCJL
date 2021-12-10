@@ -3,13 +3,16 @@ package org.overrun.cjl.token;
 import org.overrun.cjl.CJLAst;
 import org.overrun.cjl.IndexValue;
 
+import static org.overrun.cjl.token.Tokens.println;
+
 /**
  * @author squid233
  * @since 0.1.0
  */
-public class StringToken extends CJLToken {
-    public static final String value = "\u5B57\u7B26\u4E32";
+public class DefFunctionToken extends CJLToken {
+    public static final String value = "\u51FD\u6570";
 
+    @Override
     public IndexValue parse(CJLAst root,
                             String[] src,
                             IndexValue index,
@@ -17,21 +20,24 @@ public class StringToken extends CJLToken {
         final int treeIndex = index.treeIndex;
         final int srcIndex = index.srcIndex;
         IndexValue newIndex = new IndexValue();
+        newIndex.srcIndex = srcIndex + 1;
         CJLAst node = new CJLAst();
         node.value = value;
         root.children.add(treeIndex, node);
-        ++newIndex.treeIndex;
-        StringBuilder sb = new StringBuilder();
-        for (int i = srcIndex + 1; !"）".equals(src[i]); i++) {
-            sb.append(" ").append(src[i]);
+        CJLAst funName = new CJLAst();
+        funName.value = src[srcIndex];
+        root.children.add(newIndex.treeIndex = treeIndex + 1, funName);
+        for (int i = srcIndex + 1; !"}".equals(src[i]); i++) {
+            if (println.value().equals(src[i])) {
+                IndexValue v = println.parse(node,
+                    src,
+                    new IndexValue(0, i + 1),
+                    depth + 1);
+                newIndex.treeIndex = v.treeIndex;
+                i = v.srcIndex;
+            }
             newIndex.srcIndex = i;
         }
-        if (sb.length() > 1) {
-            sb.deleteCharAt(0);
-        }
-        CJLAst v = new CJLAst();
-        v.value = sb.toString();
-        node.children.add(0, v);
         return newIndex;
     }
 
@@ -42,6 +48,6 @@ public class StringToken extends CJLToken {
 
     @Override
     public String engValue() {
-        return "string";
+        return "function";
     }
 }
